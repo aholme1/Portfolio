@@ -1,0 +1,73 @@
+import os
+os.system('cls')
+import numpy as np
+
+board_ex =[
+    [0,0,0,7,1,0,6,0,9],
+    [3,0,0,6,0,0,0,0,0],
+    [0,7,0,0,0,0,0,0,0],
+    [0,2,6,0,0,0,0,4,7],
+    [0,0,0,0,0,0,0,0,0],
+    [0,0,0,0,2,4,0,0,5],
+    [0,0,0,0,0,2,0,0,6],
+    [0,0,0,9,3,0,8,1,0],
+    [9,0,1,0,0,0,0,0,2]]
+
+def find_empty(board):
+    for r in range(9):
+        for c in range(9):
+            if board [r][c] == 0:
+                return r,c
+            
+    return None, None
+
+def is_valid(board, n, row, col):
+
+    #Check if our n is already in  the row
+    row_vals = board[row]
+    if n in row_vals:
+        return False
+    
+    col_vals = [board[i][col] for i in range(9)]
+    if n in col_vals:
+        return False
+    
+    square_row = (row//3)*3
+    square_col = (col//3)*3
+
+    for r in range(square_row, square_row + 3):
+        for c in range(square_col, square_col +3):
+            if board[r][c] == n:
+                return False
+            
+    return True
+
+def solve(board):  
+    #Assign a value to row and column that is empty
+    row, col = find_empty(board)
+
+    #if there are no more empty spots then the puzzle is solved
+    if row is None:
+        return True 
+    
+    #If we still have empty places place a number
+    for n in range (1,10):
+        #use the is_valid function to determine if the n value is a "legal" value. If it is mutate the board to hold that n value
+        if is_valid(board,n,row,col):
+            board[row][col] = n
+            #recursivly call function with the updated n value placed
+            if solve(board):
+                return True
+        
+
+        #If it gets stuck and falls out of the if statement without returning true, then it's made a bad guess and gotten itself stuck.
+        #It must backtrack, so set that value instead to 0 and try again
+        board[row][col] = 0
+
+    #if we are still stuck then the board is not solvable. Return false
+    return False
+
+print(solve(board_ex))
+#convert the mutated board to an np array so it can be visualized better
+answer = np.array(board_ex)
+print(answer)
